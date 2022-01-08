@@ -1,33 +1,25 @@
-http = require("http");
-path = require("path");
-host = "localhost";
-port = 8080;
-fs = require("fs");
-url = require("url");
+const express = require("express");
+const path = require("path");
+const app = express();
+const port = 8080;
+const host = "localhost";
+const fs = require("fs");
 
 const notFoundPage = fs.readFileSync("./404.html", "utf8");
 
-const serverFunction = (req, res) => {
-  const q = url.parse(req.url, true);
-  console.log(q);
-  let filename = "." + q.pathname;
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, "about.html"));
+});
+app.get("/contact-me", (req, res) => {
+  res.sendFile(path.join(__dirname, "contact-me.html"));
+});
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "404.html"));
+});
 
-  if (filename === "./") {
-    filename = "index.html";
-  }
-  fs.readFile(filename + ".html", (err, data) => {
-    if (err) {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      console.error(err);
-      return res.end(notFoundPage);
-    }
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write(data);
-    return res.end();
-  });
-};
-
-const server = http.createServer(serverFunction);
-server.listen(port, host, () => {
-  console.log(`server is listening on port ${port}`);
+app.listen(port, () => {
+  console.log(`listening on port ${port}`);
 });
